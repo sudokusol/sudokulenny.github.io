@@ -6,49 +6,123 @@
     <title>Sudoku Solver</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Align items to the top */
             height: 100vh;
-            background-color: #f4f4f4;
+            background-color: #e0e0e0;
             margin: 0;
+            padding: 20px;
         }
+
         .container {
+            background-color: #fff;
+            padding: 15px 20px 20px 20px; /* Reduced top padding */
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
             text-align: center;
         }
+
         h1 {
-            margin-bottom: 20px;
+            font-size: 2rem;
+            margin-bottom: 15px; /* Reduced bottom margin */
+            color: #333;
         }
+
         .grid {
             display: grid;
-            grid-template-columns: repeat(9, 50px);
-            grid-template-rows: repeat(9, 50px);
+            grid-template-columns: repeat(9, 1fr);
             gap: 2px;
+            margin-bottom: 15px; /* Adjusted margin-bottom */
+            padding: 10px;
+            border: 3px solid #333; /* Outer border */
         }
+
         input[type="number"] {
-            width: 50px;
+            width: 100%;
             height: 50px;
-            font-size: 20px;
+            font-size: 1.5rem;
             text-align: center;
             border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
         }
+
         input[type="number"]:focus {
             outline: none;
             border-color: #007BFF;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
         }
+
+        /* Styling for the 3x3 subgrids to give a thicker border */
+        .grid input:nth-child(3n) {
+            border-right: 3px solid #333;
+        }
+
+        .grid input:nth-child(n+19):nth-child(-n+27),
+        .grid input:nth-child(n+46):nth-child(-n+54) {
+            border-bottom: 3px solid #333;
+        }
+
+        .grid input:nth-child(n+1):nth-child(-n+9) {
+            border-top: 3px solid #333;
+        }
+
+        .grid input:nth-child(9n+1) {
+            border-left: 3px solid #333;
+        }
+
         button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 15px 30px;
+            font-size: 1rem;
             cursor: pointer;
             background-color: #007BFF;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            transition: background-color 0.3s, box-shadow 0.2s;
         }
+
         button:hover {
             background-color: #0056b3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 768px) {
+            input[type="number"] {
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            button {
+                padding: 12px 24px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            input[type="number"] {
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -71,22 +145,19 @@
         input.type = 'number';
         input.min = 1;
         input.max = 9;
+        input.addEventListener('input', function () {
+            if (this.value > 9 || this.value < 1) {
+                this.value = '';
+            }
+        });
         grid.appendChild(input);
     }
 
     // Helper function to check if placing num in position is valid
     function isValid(board, row, col, num) {
-        // Check row
         for (let x = 0; x < 9; x++) {
-            if (board[row][x] == num) return false;
+            if (board[row][x] == num || board[x][col] == num) return false;
         }
-
-        // Check column
-        for (let x = 0; x < 9; x++) {
-            if (board[x][col] == num) return false;
-        }
-
-        // Check 3x3 grid
         let startRow = Math.floor(row / 3) * 3;
         let startCol = Math.floor(col / 3) * 3;
         for (let i = 0; i < 3; i++) {
@@ -105,11 +176,8 @@
                     for (let num = 1; num <= 9; num++) {
                         if (isValid(board, row, col, num)) {
                             board[row][col] = num;
-                            if (solve(board)) {
-                                return true;
-                            } else {
-                                board[row][col] = 0;
-                            }
+                            if (solve(board)) return true;
+                            board[row][col] = 0;
                         }
                     }
                     return false;
@@ -125,7 +193,6 @@
         let board = [];
         let k = 0;
 
-        // Create a 2D array from the input fields
         for (let i = 0; i < 9; i++) {
             board[i] = [];
             for (let j = 0; j < 9; j++) {
@@ -135,7 +202,6 @@
         }
 
         if (solve(board)) {
-            // Update the input fields with the solved Sudoku
             k = 0;
             for (let i = 0; i < 9; i++) {
                 for (let j = 0; j < 9; j++) {
